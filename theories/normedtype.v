@@ -1451,16 +1451,16 @@ Definition dominated_by {T : Type} {K : numDomainType} {V W : pseudoMetricNormed
   (h : T -> V) (k : K) (f : T -> W) (F : set (set T)) :=
   F [set x | `|f x| <= k * `|h x|].
 
-Definition strictly_dominated_by {T : Type} {K : numDomainType} {V W : normedModType K}
+Definition strictly_dominated_by {T : Type} {K : numDomainType} {V W : pseudoMetricNormedZmodType K}
   (h : T -> V) (k : K) (f : T -> W) (F : set (set T)) :=
   F [set x | `|f x| < k * `|h x|].
 
-Lemma sub_dominatedl (T : Type) (K : numFieldType) (V W : normedModType K)
+Lemma sub_dominatedl (T : Type) (K : numFieldType) (V W : pseudoMetricNormedZmodType K)
    (h : T -> V) (k : K) (F G : set (set T)) : F `=>` G ->
   (@dominated_by T K V W h k)^~ G `<=` (dominated_by h k)^~ F.
 Proof. by move=> FG f; exact: FG. Qed.
 
-Lemma sub_dominatedr (T : Type) (K : numFieldType) (V : normedModType K)
+Lemma sub_dominatedr (T : Type) (K : numFieldType) (V : pseudoMetricNormedZmodType K)
     (h : T -> V) (k : K) (f g : T -> V) (F : set (set T)) (FF : Filter F) :
    (\forall x \near F, `|f x| <= `|g x|) ->
    dominated_by h k g F -> dominated_by h k f F.
@@ -1473,7 +1473,8 @@ rewrite funeq3E => k f F.
 by congr F; rewrite funeqE => x/=; rewrite normr1 mulr1.
 Qed.
 
-Lemma strictly_dominated_by1 {T : Type} {K : numFieldType} {V : normedModType K} :
+Lemma strictly_dominated_by1 {T : Type} {K : numFieldType} 
+    {V : pseudoMetricNormedZmodType K} :
   @strictly_dominated_by T K _ V fun1 = fun k f F => F [set x | `|f x| < k].
 Proof.
 rewrite funeq3E => k f F.
@@ -1498,7 +1499,8 @@ exists M; split => // k Mk; apply: filterS FM => x /le_trans/= ->//.
 by rewrite ler_wpmul2r// ltW.
 Qed.
 
-Lemma ex_strict_dom_bound {T : Type} {K : numFieldType} {V W : normedModType K}
+Lemma ex_strict_dom_bound {T : Type} {K : numFieldType} 
+    {V W : pseudoMetricNormedZmodType K}
     (h : T -> V) (f : T -> W) (F : set (set T)) {PF : ProperFilter F} :
   (\forall x \near F, h x != 0) ->
   (\forall M \near +oo, dominated_by h M f F) <->
@@ -1510,25 +1512,26 @@ exists (M + 1); apply: filterS2 hN0 FM => x hN0 /le_lt_trans/= ->//.
 by rewrite ltr_pmul2r ?normr_gt0// ltr_addl.
 Qed.
 
-Definition bounded_near {T : Type} {K : numFieldType} {V : normedModType K}
+Definition bounded_near {T : Type} {K : numFieldType} 
+    {V : pseudoMetricNormedZmodType K}
   (f : T -> V) (F : set (set T)) :=
   \forall M \near +oo, F [set x | `|f x| <= M].
 
-Lemma boundedE {T : Type} {K : numFieldType} {V : normedModType K} :
+Lemma boundedE {T : Type} {K : numFieldType} {V : pseudoMetricNormedZmodType K} :
   @bounded_near T K V = fun f F => \forall M \near +oo, dominated_by fun1 M f F.
 Proof. by rewrite dominated_by1. Qed.
 
-Lemma sub_boundedr (T : Type) (K : numFieldType) (V : normedModType K)
+Lemma sub_boundedr (T : Type) (K : numFieldType) (V : pseudoMetricNormedZmodType K)
      (F G : set (set T)) : F `=>` G ->
   (@bounded_near T K V)^~ G `<=` bounded_near^~ F.
 Proof. by move=> FG f; rewrite /bounded_near; apply: filterS=> M; apply: FG. Qed.
 
-Lemma sub_boundedl (T : Type) (K : numFieldType) (V : normedModType K)
+Lemma sub_boundedl (T : Type) (K : numFieldType) (V : pseudoMetricNormedZmodType K)
      (f g : T -> V) (F : set (set T)) (FF : Filter F) :
  (\forall x \near F, `|f x| <= `|g x|) ->  bounded_near g F -> bounded_near f F.
 Proof.
 move=> le_fg; rewrite /bounded_near; apply: filterS => M.
-by apply: filterS2 le_fg => x; apply: le_trans.
+by apply: filterS2 le_fg => x; apply: le_trans. 
 Qed.
 
 Lemma ex_bound {T : Type} {K : numFieldType} {V : pseudoMetricNormedZmodType K}
@@ -1536,7 +1539,7 @@ Lemma ex_bound {T : Type} {K : numFieldType} {V : pseudoMetricNormedZmodType K}
   bounded_near f F <-> exists M, F [set x | `|f x| <= M].
 Proof. by rewrite boundedE ex_dom_bound dominated_by1. Qed.
 
-Lemma ex_strict_bound {T : Type} {K : numFieldType} {V : normedModType K}
+Lemma ex_strict_bound {T : Type} {K : numFieldType} {V : pseudoMetricNormedZmodType K}
   (f : T -> V) (F : set (set T)) {PF : ProperFilter F}:
   bounded_near f F <-> exists M, F [set x | `|f x| < M].
 Proof.
@@ -1544,7 +1547,7 @@ rewrite boundedE ex_strict_dom_bound ?strictly_dominated_by1//.
 by near=> x; rewrite oner_eq0.
 Grab Existential Variables. all: end_near. Qed.
 
-Lemma ex_strict_bound_gt0 {T : Type} {K : numFieldType} {V : normedModType K}
+Lemma ex_strict_bound_gt0 {T : Type} {K : numFieldType} {V : pseudoMetricNormedZmodType K}
   (f : T -> V) (F : set (set T)) {PF : Filter F}:
   bounded_near f F -> exists2 M, M > 0 & F [set x | `|f x| < M].
 Proof.
@@ -1752,16 +1755,18 @@ rewrite -(subrKA z) (le_trans (ler_norm_add _ _) _)// ltW //.
 by rewrite (splitr e%:num) (distrC z); apply: ltr_add.
 Qed.
 
-Lemma pseudoMetricNormedZModType_hausdorff (R : realFieldType) (V : pseudoMetricNormedZmodType R) :
+Lemma pseudoMetricNormedZModType_hausdorff (R : realFieldType) 
+(V : pseudoMetricNormedZmodType R) :
   hausdorff V.
 Proof.
 move=> p q clp_q; apply/subr0_eq/normr0_eq0/Rhausdorff => A B pq_A.
 rewrite -(@normr0 _ V) -(subrr p) => pp_B.
-suff loc_preim r C : @locally _ [filteredType R of R^o] `|p - r| C ->
-    locally r ((fun r => `|p - r|) @^-1` C).
+suff loc_preim r C : nbhs`|p - r| C ->
+    nbhs r ((fun r => `|p - r|) @^-1` C).
   have [r []] := clp_q _ _ (loc_preim _ _ pp_B) (loc_preim _ _ pq_A).
   by exists `|p - r|.
-move=> [e egt0 pre_C]; apply: locally_le_locally_norm; exists e => // s re_s.
+move=> [e egt0 pre_C]; apply: nbhs_le_nbhs_norm; exists e => // s.
+rewrite -ball_normE /= => re_s.
 apply: pre_C; apply: le_lt_trans (ler_dist_dist _ _) _.
 by rewrite opprB addrC subrKA distrC.
 Qed.
@@ -1783,14 +1788,11 @@ Lemma continuous_cvg_dist {R : numFieldType}
   (V W : pseudoMetricNormedZmodType R) (f : V -> W) x l :
   continuous f -> x --> l -> forall e : {posnum R}, `|f l - f x| < e%:num.
 Proof.
-move=> cf xl e.
-move/cvg_dist: (cf l) => /(_ _ (posnum_gt0 e)).
-rewrite nearE /= => /locallyP; rewrite locally_E => -[i i0]; apply.
-have /@cvg_dist : Filter [filter of x] by apply: (@filter_on_Filter V).
-move/(_ _ xl _ i0).
-rewrite nearE /= => /locallyP; rewrite locally_E => -[j j0].
-by move/(_ _ (ballxx _ j0)); rewrite -ball_normE.
+ move=> + + e => /(_ l)/cvg_dist/(_ _ (posnum_gt0 e)).
+rewrite near_map => /nbhs_ballP[_/posnumP[a]] + xl; apply.
+move/(cvg_ball (y :=l)): xl=> /(_ _ a)/nbhs_ballP[_/posnumP[b]]; apply; exact: ballxx.
 Qed.
+(*NB: was /cvg_ball before *)
 
 (* TODO: general purpose lemma? *)
 Lemma filter_andb I r (a P : pred I) :
@@ -1918,6 +1920,8 @@ rewrite asbool_and negb_and => /orP [/asboolPn/negP|/existsp_asboolPn [i]].
   by rewrite -ltNge; left.
 by move=> /asboolPn/imply_asboolPn [Pi /negP]; rewrite -ltNge; right; exists i.
 Qed.
+End bigmaxr_nonneg.
+End BigmaxrNonneg.
 
 Module BigmaxBigminr.
 Section bigmax_bigmin.
@@ -2435,13 +2439,13 @@ Qed.
 Section NVS_continuity_normedModType.
 Context {K : numFieldType} {V : normedModType K}.
 Local Notation "'+oo'" := (pinfty_nbhs K).
-
+(* 
 Lemma add_continuous : continuous (fun z : V * V => z.1 + z.2).
 Proof.
 move=> [/=x y]; apply/cvg_distP=> _/posnumP[e].
 rewrite !near_simpl /=; near=> a b => /=; rewrite opprD addrACA.
 by rewrite normm_lt_split //; [near: a|near: b]; apply: cvg_dist.
-Grab Existential Variables. all: end_near. Qed.
+Grab Existential Variables. all: end_near. Qed. *)
 
 Lemma natmul_continuous n : continuous (fun x : V => x *+ n).
 Proof.
