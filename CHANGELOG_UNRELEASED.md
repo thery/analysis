@@ -124,6 +124,8 @@
   + `addERFin` -> `addEFin`
   + `sumERFin`-> `sumEFin`
   + `subERFin` -> `subEFin`
+- in `forms.v`:
+  + `symmetric` -> `sesqui_symmetric`
 
 ### Removed
 
